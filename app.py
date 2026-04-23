@@ -1,62 +1,35 @@
-from flask import Flask, request, redirect, session
-from flask_mail import Mail, Message
+from flask import Flask, render_template, request, session
 import random
 
 app = Flask(__name__)
-app.secret_key = "secret123"
+app.secret_key = "kha_secret_key"
 
-# cấu hình Gmail gửi mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'ht571977@gmail.comN'
-app.config['MAIL_PASSWORD'] = 'gpqw emgr ncly imyk'
+# Tạo OTP
+def create_otp():
+    return str(random.randint(100000, 999999))
 
-mail = Mail(app)
-
-# trang nhập email
-@app.route("/", methods=["GET","POST"])
-def login():
+@app.route("/", methods=["GET", "POST"])
+def index():
     if request.method == "POST":
-        email = request.form["email"]
-        otp = str(random.randint(100000,999999))
-
+        otp = create_otp()
         session["otp"] = otp
-        session["email"] = email
 
-        msg = Message(
-            "Mã OTP đăng nhập",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[email]
-        )
-        msg.body = f"Mã OTP của bạn là: {otp}"
+        print("OTP của bạn là:", otp)  # không cần Gmail
 
-        mail.send(msg)
-        return redirect("/verify")
+        return "OTP đã tạo, kiểm tra console/log"
 
-    return '''
-    <h2>Đăng nhập bằng Email</h2>
-    <form method="post">
-        <input name="email" placeholder="Nhập email">
-        <button>Gửi OTP</button>
-    </form>
-    '''
+    return render_template("index.html")
 
-# trang nhập OTP
-@app.route("/verify", methods=["GET","POST"])
+
+@app.route("/verify", methods=["POST"])
 def verify():
-    if request.method == "POST":
-        if request.form["otp"] == session.get("otp"):
-            return f"Đăng nhập thành công: {session.get('email')} 🎉"
-        else:
-            return "Sai OTP ❌"
+    user_otp = request.form.get("otp")
 
-    return '''
-    <h2>Nhập OTP</h2>
-    <form method="post">
-        <input name="otp">
-        <button>Xác nhận</button>
-    </form>
-    '''
+    if user_otp == session.get("otp"):
+        return "✅ OTP đúng"
+    else:
+        return "❌ OTP sai"
 
-app.run(host="0.0.0.0", port=5000)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
