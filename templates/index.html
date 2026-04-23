@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tài Xỉu Python</title>
+</head>
+
+<body style="text-align:center;font-family:Arial">
+<h1>🎲 Tài Xỉu</h1>
+
+<h2>Coins: <span id="coins">{{coins}}</span></h2>
+
+<input id="bet" type="number" placeholder="Số coin cược"><br><br>
+
+<button onclick="play('tai')">Cược TÀI</button>
+<button onclick="play('xiu')">Cược XỈU</button>
+
+<h2 id="result"></h2>
+
+<script>
+function play(choice){
+    let bet = document.getElementById("bet").value;
+
+    fetch("/bet", {
+        method:"POST",
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({choice:choice, bet:bet})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.msg == "Không đủ coin!"){
+            alert(data.msg);
+            return;
+        }
+
+        document.getElementById("coins").innerText = data.coins;
+        document.getElementById("result").innerHTML =
+        "Xúc xắc: " + data.dice +
+        "<br>Tổng: " + data.total +
+        "<br>Kết quả: " + data.result +
+        "<br>" + data.msg;
+    });
+}
+</script>
+</body>
+</html>

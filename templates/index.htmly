@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tài Xỉu Python</title>
+</head>
+<body style="text-align:center;font-family:Arial">
+    <h1>🎲 Tài Xỉu Online</h1>
+    <button onclick="play()">Lắc xúc xắc</button>
+    
+    <h2 id="result"></h2>
+
+<script>
+function play(){
+    fetch("/play", {method:"POST"})
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerHTML =
+        "Xúc xắc: " + data.dice +
+        "<br>Tổng: " + data.total +
+        "<br>Kết quả: " + data.result;
+    });
+}
+</script>
+</body>
+</html>
