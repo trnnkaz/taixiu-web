@@ -1,0 +1,3 @@
+Flask
+gunicorn
+ĩĩFlask-Mail
